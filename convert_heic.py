@@ -1,6 +1,7 @@
-from PIL import Image
+from PIL import Image, ImageSequence
 import os
 import argparse
+import pyheif
 
 def convert_heic_to_jpeg(input_directory, output_directory):
     # Get list of HEIF and HEIC files in directory
@@ -11,7 +12,18 @@ def convert_heic_to_jpeg(input_directory, output_directory):
         input_path = os.path.join(input_directory, filename)
         output_path = os.path.join(output_directory, os.path.splitext(filename)[0] + '.jpg')
 
-        image = Image.open(input_path)
+        heif_file = pyheif.read(input_path)
+
+        # Explicitly specify the HEIC plugin for Pillow
+        image = Image.frombytes(
+            heif_file.mode,
+            heif_file.size,
+            heif_file.data,
+            "raw",
+            heif_file.mode,
+            heif_file.stride,
+        )
+
         image.convert('RGB').save(output_path)
 
 def main():
