@@ -1,6 +1,12 @@
 import os
 import argparse
 
+
+# If you use \ for file paths, don't forget to escape them to avoid issues.
+# *** weight names using ANY UPPERCASE LETTERS may fail due issue with YOLO software itself 
+
+
+
 def run_detection(weights_folder, target_folder):
     # Loop through each weight file
     for weight_file in os.listdir(weights_folder):
@@ -8,11 +14,14 @@ def run_detection(weights_folder, target_folder):
             weight_path = os.path.join(weights_folder, weight_file)
             print(weight_path)
             weight_name = os.path.splitext(weight_file)[0]
-            # Construct the command with the current weights file
-            # *** If you use \ for file paths, don't forget to escape them to avoid issues.
-            # --no-trace is faster if the number of images is small like 50 or less, otherwise tracing ends up being faster
+            
+            # Argument tweaking:
+            # --conf is the confidence cutoff so anything with lower confidence is ignored  
+            # --no-trace is faster if the number of images is small like 50 or less, otherwise traced model ends is overall faster
+            # if you wish to see the prediction on the actual images remove --nosave
+            
             command = f"python detect.py --weights {weight_path} --exist-ok --save-txt --save-conf --nosave --img 640 --conf 0.3 --source {target_folder} --name {weight_name}"
-            # Run the command
+            # Run the detection command
             os.system(command)
 
 if __name__ == "__main__":
